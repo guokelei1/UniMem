@@ -4,7 +4,7 @@
 #include <map>
 #include <bitset>
 
-#define CAPACITY 1015
+#define CAPACITY 57
 #define SUBPAGE 0xfff
 #define PAGE 0xfff
 #define INDEX 0x0

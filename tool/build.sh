@@ -3,6 +3,7 @@
     apt install python-is-python2 -y
     apt install tmux -y
     apt install memcached -y
+    apt install wget -y
     #download pintool
     wget https://software.intel.com/sites/landingpage/pintool/downloads/pin-3.30-98830-g1d7b601b3-gcc-linux.tar.gz
     tar -xzf pin-3.30-98830-g1d7b601b3-gcc-linux.tar.gz

@@ -5,7 +5,7 @@
 #include <bitset>
 #include <iostream>
 
-#define CAPACITY 103
+#define CAPACITY 131
 #define ACTIVE (CAPACITY * 9 / 10)
 #define INACTIVE ((CAPACITY + 9) / 10)
 #define CANDIDATE (CAPACITY * 9 / 10)

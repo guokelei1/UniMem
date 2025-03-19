@@ -34,6 +34,9 @@ typedef struct lruList {
 
 void insert(Page p, unsigned offset, unsigned size)
 {
+
+	//更新page内部的地址
+	//就是一个合并范围的过程。不知道为什么要搞这个
 	Addr tmp = p->first, left = p->first;
 
 	if (offset + size < tmp->head) {
@@ -187,6 +190,7 @@ int createPage(LRUList lru, unsigned long long tmp_page_num, unsigned offset, un
 	else {
 		Page tmp_pg = NULL;
 		if (lru->active_size != 0) {
+			//在活跃列表中找数据
 			tmp_pg = lru->active_head;
 			for (unsigned i = lru->active_size; i > 0; i--) {
 				if (tmp_pg->page_num == tmp_page_num) {
@@ -207,6 +211,7 @@ int createPage(LRUList lru, unsigned long long tmp_page_num, unsigned offset, un
 			}
 		}
 		if (flag == 0) {
+			//活跃非活跃都没找到
 			Page pg = (Page)malloc(sizeof(pageNode));
 			pg->llink = NULL;
 			pg->rlink = NULL;
@@ -227,10 +232,11 @@ int createPage(LRUList lru, unsigned long long tmp_page_num, unsigned offset, un
 			}
 		}
 		if (flag == 1) {
+			//在非活跃之中
 			insert(tmp_pg, offset, tmp_size);
 			if(is_write)
 				tmp_pg->dirty = 1;
-
+			//删除节点
 			if (tmp_pg->llink == NULL) {
 				if (tmp_pg->rlink == NULL) {
 					lru->inactive_head = NULL;
@@ -255,6 +261,8 @@ int createPage(LRUList lru, unsigned long long tmp_page_num, unsigned offset, un
 					lru->inactive_size -= 1;
 				}
 			}
+
+			
 			if (lru->active_size < lru->inactive_size + 1) {
 				activeInsert(lru, tmp_pg);
 			}
@@ -265,6 +273,7 @@ int createPage(LRUList lru, unsigned long long tmp_page_num, unsigned offset, un
 			}
 		}
 		if (flag == 2) {
+			//在活跃列表之中
 			insert(tmp_pg, offset, tmp_size);
 			if(is_write)
 				tmp_pg->dirty = 1;
@@ -323,8 +332,11 @@ int main(int argc, char* argv[])
 		if(c == 'W'){
 			dirty = 1;
 		}
+		//页编号
 		tmp_page = tmp_num / (SUBPAGE + 0x1);
+		//多路cache 选路
 		tmp_group = (tmp_num / (SUBPAGE + 0x1)) & INDEX;
+		//offset用于判断是否溢出
 		offset = tmp_num & SUBPAGE;
 
 		++line;

@@ -4,6 +4,7 @@
 
 #define SUBPAGE 0xfff
 
+//答辩程序，迟早要改。
 typedef struct pageNode {
 	unsigned long long page_num;
 	pageNode* llink;

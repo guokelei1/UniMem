@@ -96,6 +96,8 @@ void L1DeletePage(FIFOList* L1_cache, unsigned long long tmp_page_num)
 			}
 			tmp_pg = tmp_pg->rlink;
 		}
+
+		free(tmp_pg);
 	}
 }
 
@@ -134,6 +136,7 @@ void L2DeletePage(FIFOList* L2_cache, unsigned long long tmp_page_num)
 			}
 			tmp_pg = tmp_pg->rlink;
 		}
+		free(tmp_pg);
 	}
 }
 
@@ -146,6 +149,7 @@ int readCache(L3_Cache cache, unsigned long long tmp_page_num)
 	int L3_group = tmp_page_num % L3_SET;
 
 	Page tmp_pg = NULL;
+	//在cache中寻找，flag设为找到的cache层级
 	if (cache->L1_cache[L1_group]->list_size > 0) {
 		tmp_pg = cache->L1_cache[L1_group]->list_head;
 		for (unsigned i = cache->L1_cache[L1_group]->list_size; i > 0; i--) {
@@ -180,6 +184,7 @@ int readCache(L3_Cache cache, unsigned long long tmp_page_num)
 	}
 
 	if (flag == 0) {
+		//未找到，将其插入cache
 		Page pg3 = (Page)malloc(sizeof(pageNode));
 		pg3->llink = NULL;
 		pg3->rlink = NULL;
@@ -188,6 +193,7 @@ int readCache(L3_Cache cache, unsigned long long tmp_page_num)
 			listInsert(cache->L3_cache[L3_group], pg3);
 		}
 		else {
+			//cache从L3逐出就一定从L2，L1逐出，这种方式正确吗?
 			unsigned long long tmp_num = listDeleteTail(cache->L3_cache[L3_group]);
 			L2DeletePage(cache->L2_cache, tmp_num);
 			L1DeletePage(cache->L1_cache, tmp_num);
@@ -223,6 +229,7 @@ int readCache(L3_Cache cache, unsigned long long tmp_page_num)
 
 	}
 	if (flag == 2) {
+		//cache 提升
 		Page pg1 = (Page)malloc(sizeof(pageNode));
 		pg1->llink = NULL;
 		pg1->rlink = NULL;
@@ -313,6 +320,7 @@ int main(int argc, char* argv[])
 		offset = tmp_num & CACHELINE;
 
 		if (offset + tmp_size - 1 <= CACHELINE) {
+			//访存在一行内
 			if (readCache(cache, tmp_page) == 0) {
 				fprintf(fp, "%c 0x%llx %u\n", c, tmp_num - offset, 64);
 			}
